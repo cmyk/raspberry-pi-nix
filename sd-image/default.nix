@@ -16,6 +16,36 @@ let
             status = "disabled";
         };
     };
+    fragment@1 {
+        target = <&uart1>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+    fragment@2 {
+        target = <&uart2>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+    fragment@3 {
+        target = <&uart3>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+    fragment@4 {
+        target = <&uart4>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
+    fragment@5 {
+        target = <&uart5>;
+        __overlay__ {
+            status = "disabled";
+        };
+    };
 };
 EOF
     dtc -I dts -O dtb -o $out disable-uart.dts
