@@ -50,6 +50,9 @@
         ls -l /tmp/root-fs.img
         ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $((SECTORS - 32768))
         echo "DEBUG: Copying resized root-fs.img back"
+        chmod 666 ./root-fs.img  # Fix permissions on original file
+        echo "DEBUG: After chmod on original - ls -l ./root-fs.img"
+        ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
         dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS
       '';
