@@ -35,13 +35,22 @@
         echo "$content" > ./files/sbin/init
         chmod 744 ./files/sbin/init
       '';
-      firmwareSize = 1024; # Bump to 1 GiB
+      firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
         # Resize image to 8G total
         truncate -s 8G $img
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
-        ${pkgs.e2fsprogs}/bin/resize2fs ./root-fs.img $((SECTORS - 32768))
+        echo "DEBUG: Before resize - ls -l ./root-fs.img"
+        ls -l ./root-fs.img
+        echo "DEBUG: Copying root-fs.img to temp location"
+        cp ./root-fs.img /tmp/root-fs.img
+        chmod 666 /tmp/root-fs.img
+        echo "DEBUG: After chmod - ls -l /tmp/root-fs.img"
+        ls -l /tmp/root-fs.img
+        ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $((SECTORS - 32768))
+        echo "DEBUG: Copying resized root-fs.img back"
+        cp /tmp/root-fs.img ./root-fs.img
         dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS
       '';
     };
