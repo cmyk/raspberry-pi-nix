@@ -23,7 +23,16 @@
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/bootcode.bin firmware/bootcode.bin
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
-        echo "[all]\narm_64bit=1\nenable_uart=1\ndtoverlay=disable-bt\nkernel=kernel.img\ninitramfs initrd followkernel\ndevice_tree=bcm2712-rpi-cm5-cm5io.dtb\nos_check=0" > firmware/config.txt
+        cat > firmware/config.txt <<EOF
+      [all]
+      arm_64bit=1
+      enable_uart=1
+      dtoverlay=disable-bt
+      kernel=kernel.img
+      initramfs initrd followkernel
+      device_tree=bcm2712-rpi-cm5-cm5io.dtb
+      os_check=0
+      EOF
         echo "console=ttyAMA10,115200 root=/dev/nvme0n1p2 rootwait cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
