@@ -33,7 +33,7 @@
       device_tree=bcm2712-rpi-cm5-cm5io.dtb
       os_check=0
       EOF
-        echo "console=ttyAMA10,115200 root=/dev/nvme0n1p2 rootwait cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+        echo "root=/dev/nvme0n1p2 rootwait cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
         mkdir -p ./files/sbin
