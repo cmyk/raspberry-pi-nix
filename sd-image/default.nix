@@ -9,61 +9,41 @@
     boot.consoleLogLevel = lib.mkDefault 7;
 
     boot.kernelParams = [
-      # This is ugly and fragile, but the sdImage image has an msdos
-      # table, so the partition table id is a 1-indexed hex
-      # number. So, we drop the hex prefix and stick on a "02" to
-      # refer to the root partition.
       "root=PARTUUID=${lib.strings.removePrefix "0x" config.sdImage.firmwarePartitionID}-02"
       "rootfstype=ext4"
       "fsck.repair=yes"
       "rootwait"
     ];
 
-    sdImage =
-      let
-        kernel-params = pkgs.writeTextFile {
-          name = "cmdline.txt";
-          text = ''
-            ${lib.strings.concatStringsSep " " config.boot.kernelParams}
-          '';
-        };
-        cfg = config.raspberry-pi-nix;
-        version = cfg.kernel-version;
-        board = cfg.board;
-        kernel = "${config.system.build.kernel}/${config.system.boot.loader.kernelFile}";
-        initrd = "${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}";
-        populate-kernel =
-          if cfg.uboot.enable
-          then ''
-            cp ${cfg.uboot.package}/u-boot.bin firmware/u-boot-rpi-arm64.bin
-          ''
-          else ''
-            cp "${kernel}" firmware/kernel.img
-            cp "${initrd}" firmware/initrd
-            cp "${kernel-params}" firmware/cmdline.txt
-          '';
-      in
-      {
-        populateFirmwareCommands = ''
-          ${populate-kernel}
-          cp -r ${pkgs.raspberrypifw}/share/raspberrypi/boot/{start*.elf,*.dtb,bootcode.bin,fixup*.dat,overlays} firmware
-          cp ${config.hardware.raspberry-pi.config-output} firmware/config.txt
-        '';
-        populateRootCommands =
-          if cfg.uboot.enable
-          then ''
-            mkdir -p ./files/boot
-            ${config.boot.loader.generic-extlinux-compatible.populateCmd} -c ${config.system.build.toplevel} -d ./files/boot
-          ''
-          else ''
-            mkdir -p ./files/sbin
-            content="$(
-              echo "#!${pkgs.bash}/bin/bash"
-              echo "exec ${config.system.build.toplevel}/init"
-            )"
-            echo "$content" > ./files/sbin/init
-            chmod 744 ./files/sbin/init
-          '';
-      };
+    sdImage = {
+      populateFirmwareCommands = ''
+        cp ${config.boot.kernelPackages.kernel}/Image firmware/kernel.img
+        cp ${config.system.build.initialRamdisk}/initrd firmware/initrd
+        cp ${config.boot.kernelPackages.kernel}/dtbs/broadcom/bcm2712-rpi-cm5-cm5io.dtb firmware/bcm2712-rpi-cm5-cm5io.dtb
+        cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/bootcode.bin firmware/bootcode.bin
+        cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
+        cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
+        echo "[all]\narm_64bit=1\nenable_uart=1\ndtoverlay=disable-bt\nkernel=kernel.img\ninitramfs initrd followkernel" > firmware/config.txt
+        echo "console=ttyAMA10,115200 root=/dev/nvme0n1p2 rootwait cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+      '';
+      populateRootCommands = ''
+        mkdir -p ./files/sbin
+        content="$(
+          echo "#!${pkgs.bash}/bin/bash"
+          echo "exec ${config.system.build.toplevel}/init"
+        )"
+        echo "$content" > ./files/sbin/init
+        chmod 744 ./files/sbin/init
+      '';
+      firmwareSize = 256;
+      postBuildCommands = ''
+        # Resize image to 8G total
+        truncate -s 8G $img
+        echo ",+," | sfdisk -N 2 --no-reread $img
+        eval $(partx $img -o START,SECTORS --nr 2 --pairs)
+        ${pkgs.e2fsprogs}/bin/resize2fs ./root-fs.img $((SECTORS - 32768))
+        dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS
+      '';
+    };
   };
 }
