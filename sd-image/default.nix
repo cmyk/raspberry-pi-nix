@@ -26,7 +26,7 @@
         cat > firmware/config.txt <<EOF
       [all]
       arm_64bit=1
-      enable_uart=1
+      enable_uart=0
       dtoverlay=disable-bt
       kernel=kernel.img
       initramfs initrd followkernel
