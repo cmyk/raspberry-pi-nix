@@ -1,50 +1,5 @@
 { config, lib, pkgs, ... }:
-
-let
-  disableUartOverlay = pkgs.runCommand "disable-uart.dtbo" {
-    nativeBuildInputs = [ pkgs.dtc ];
-  } ''
-    cat > disable-uart.dts <<EOF
-/dts-v1/;
-/plugin/;
-
-/ {
-    compatible = "brcm,bcm2712";
-    fragment@0 {
-        target = <&uart0>;
-        __overlay__ {
-            status = "disabled";
-        };
-    };
-    fragment@1 {
-        target = <&uart1>;
-        __overlay__ {
-            status = "disabled";
-        };
-    };
-    fragment@2 {
-        target = <&uart2>;
-        __overlay__ {
-            status = "disabled";
-        };
-    };
-    fragment@3 {
-        target = <&uart3>;
-        __overlay__ {
-            status = "disabled";
-        };
-    };
-    fragment@4 {
-        target = <&uart4>;
-        __overlay__ {
-            status = "disabled";
-        };
-    };
-};
-EOF
-    dtc -I dts -O dtb -o $out disable-uart.dts
-  '';
-in {
+{
   imports = [ ./sd-image.nix ];
   config = {
     boot.loader.grub.enable = false;
@@ -64,13 +19,13 @@ in {
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
         mkdir -p firmware/overlays
-        cp ${disableUartOverlay} firmware/overlays/disable-uart.dtbo
+        cp ${config.boot.kernelPackages.kernel}/dtbs/overlays/bcm2712d0.dtbo firmware/overlays/bcm2712d0.dtbo
         cat > firmware/config.txt <<EOF
 [all]
 arm_64bit=1
 enable_uart=0
 dtoverlay=disable-bt
-dtoverlay=disable-uart
+dtoverlay=bcm2712d0
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
