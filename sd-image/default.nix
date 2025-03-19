@@ -23,7 +23,7 @@
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/bootcode.bin firmware/bootcode.bin
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
-        echo "[all]\narm_64bit=1\nenable_uart=1\ndtoverlay=disable-bt\nkernel=kernel.img\ninitramfs initrd followkernel" > firmware/config.txt
+        echo "[all]\narm_64bit=1\nenable_uart=1\ndtoverlay=disable-bt\nkernel=kernel.img\ninitramfs initrd followkernel\ndevice_tree=bcm2712-rpi-cm5-cm5io.dtb\nos_check=0" > firmware/config.txt
         echo "console=ttyAMA10,115200 root=/dev/nvme0n1p2 rootwait cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
@@ -50,7 +50,7 @@
         ls -l /tmp/root-fs.img
         ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $((SECTORS - 32768))
         echo "DEBUG: Copying resized root-fs.img back"
-        chmod 666 ./root-fs.img  # Fix permissions on original file
+        chmod 666 ./root-fs.img
         echo "DEBUG: After chmod on original - ls -l ./root-fs.img"
         ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
