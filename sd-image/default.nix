@@ -40,12 +40,6 @@ let
             status = "disabled";
         };
     };
-    fragment@5 {
-        target = <&uart5>;
-        __overlay__ {
-            status = "disabled";
-        };
-    };
 };
 EOF
     dtc -I dts -O dtb -o $out disable-uart.dts
