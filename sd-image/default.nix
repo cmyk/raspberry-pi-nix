@@ -35,7 +35,7 @@
         echo "$content" > ./files/sbin/init
         chmod 744 ./files/sbin/init
       '';
-      firmwareSize = 256;
+      firmwareSize = 512; # Bump to 512 MiB
       postBuildCommands = ''
         # Resize image to 8G total
         truncate -s 8G $img
