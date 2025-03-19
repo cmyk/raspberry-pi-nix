@@ -16,25 +16,28 @@
     ];
 
     sdImage = {
-      populateFirmwareCommands = ''
+        populateFirmwareCommands = ''
           cp ${config.boot.kernelPackages.kernel}/Image firmware/kernel.img
           cp ${config.system.build.initialRamdisk}/initrd firmware/initrd
           cp ${config.boot.kernelPackages.kernel}/dtbs/broadcom/bcm2712-rpi-cm5-cm5io.dtb firmware/bcm2712-rpi-cm5-cm5io.dtb
           cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/bootcode.bin firmware/bootcode.bin
           cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
           cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
+          # Add custom overlay to disable brcmuart
+          echo "dtoverlay=disable-uart" > firmware/overlays/disable-uart.dtbo
           cat > firmware/config.txt <<EOF
-      [all]
-      arm_64bit=1
-      enable_uart=0
-      dtoverlay=disable-bt
-      kernel=kernel.img
-      initramfs initrd followkernel
-      device_tree=bcm2712-rpi-cm5-cm5io.dtb
-      os_check=0
-      EOF
-          echo "8250.nr_uarts=0 root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
-        '';
+    [all]
+    arm_64bit=1
+    enable_uart=0
+    dtoverlay=disable-bt
+    dtoverlay=disable-uart
+    kernel=kernel.img
+    initramfs initrd followkernel
+    device_tree=bcm2712-rpi-cm5-cm5io.dtb
+    os_check=0
+    EOF
+        echo "8250.nr_uarts=0 root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+      '';
       populateRootCommands = ''
         mkdir -p ./files/sbin
         content="$(
