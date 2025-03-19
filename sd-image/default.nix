@@ -16,16 +16,30 @@
     ];
 
     sdImage = {
-        populateFirmwareCommands = ''
-          cp ${config.boot.kernelPackages.kernel}/Image firmware/kernel.img
-          cp ${config.system.build.initialRamdisk}/initrd firmware/initrd
-          cp ${config.boot.kernelPackages.kernel}/dtbs/broadcom/bcm2712-rpi-cm5-cm5io.dtb firmware/bcm2712-rpi-cm5-cm5io.dtb
-          cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/bootcode.bin firmware/bootcode.bin
-          cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
-          cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
-          # Add custom overlay to disable brcmuart
-          echo "dtoverlay=disable-uart" > firmware/overlays/disable-uart.dtbo
-          cat > firmware/config.txt <<EOF
+    populateFirmwareCommands = ''
+        cp ${config.boot.kernelPackages.kernel}/Image firmware/kernel.img
+        cp ${config.system.build.initialRamdisk}/initrd firmware/initrd
+        cp ${config.boot.kernelPackages.kernel}/dtbs/broadcom/bcm2712-rpi-cm5-cm5io.dtb firmware/bcm2712-rpi-cm5-cm5io.dtb
+        cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/bootcode.bin firmware/bootcode.bin
+        cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
+        cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
+        # Create a disable-uart overlay
+        cat > firmware/overlays/disable-uart.dts <<EOF
+    /dts-v1/;
+    /plugin/;
+
+    / {
+        compatible = "brcm,bcm2712";
+        fragment@0 {
+            target = <&serial0>;
+            __overlay__ {
+                status = "disabled";
+            };
+        };
+    };
+    EOF
+        ${pkgs.dtc}/bin/dtc -I dts -O dtb -o firmware/overlays/disable-uart.dtbo firmware/overlays/disable-uart.dts
+        cat > firmware/config.txt <<EOF
     [all]
     arm_64bit=1
     enable_uart=0
