@@ -11,7 +11,7 @@ let
 / {
     compatible = "brcm,bcm2712";
     fragment@0 {
-        target = <&serial0>;
+        target = <&uart0>;
         __overlay__ {
             status = "disabled";
         };
@@ -22,19 +22,15 @@ EOF
   '';
 in {
   imports = [ ./sd-image.nix ];
-
   config = {
     boot.loader.grub.enable = false;
-
     boot.consoleLogLevel = lib.mkDefault 7;
-
     boot.kernelParams = [
       "root=PARTUUID=${lib.strings.removePrefix "0x" config.sdImage.firmwarePartitionID}-02"
       "rootfstype=ext4"
       "fsck.repair=yes"
       "rootwait"
     ];
-
     sdImage = {
       populateFirmwareCommands = ''
         cp ${config.boot.kernelPackages.kernel}/Image firmware/kernel.img
@@ -69,7 +65,6 @@ EOF
       '';
       firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
-        # Resize image to 8G total
         truncate -s 8G $img
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
