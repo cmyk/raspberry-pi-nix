@@ -44,7 +44,8 @@ EOF
       '';
       firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
-        truncate -s 8G $img
+        # Resize image to match NVMe partition (7.5G)
+        truncate -s 7500M $img
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
         echo "DEBUG: Before resize - ls -l ./root-fs.img"
