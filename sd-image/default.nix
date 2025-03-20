@@ -9,7 +9,7 @@
       "fsck.repair=yes"
       "rootwait"
       "console=ttyAMA10,115200"
-      "coherent_pool=2M"
+      "coherent_pool=4M"
       "cma=512M"
       "nvme_core.default_ps_max_latency_us=0"
       "fsck.mode=force"
@@ -37,7 +37,7 @@ device_tree=bcm2712-rpi-cm5-cm5io.dtb
 boot_order=0x20
 
 EOF
-        echo "root=/dev/nvme0n1p2 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=2M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+        echo "root=/dev/nvme0n1p2 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=4M cma=512M nvme_core.default_ps_max_latency_us=0 fsck.mode=force" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
         echo "Populating root filesystem..."
