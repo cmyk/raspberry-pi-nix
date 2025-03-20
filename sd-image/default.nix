@@ -71,6 +71,10 @@ EOF
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Copying resized root-fs.img back..."
+        echo "DEBUG: Ensuring ./root-fs.img is writable before copy..."
+        chmod 666 ./root-fs.img
+        echo "DEBUG: Permissions after chmod - ls -l ./root-fs.img"
+        ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
         sync
         echo "DEBUG: After copy back - ls -l ./root-fs.img"
@@ -82,20 +86,14 @@ EOF
         sync
         echo "DEBUG: Final image partition table"
         sfdisk -d $img
-        echo "DEBUG: Extracting partition 2 from final image to verify filesystem contents..."
+        echo "DEBUG: Extracting partition 2 from final image to verify filesystem size..."
         dd if=$img of=/tmp/part2.img skip=$START count=$SECTORS bs=512 status=progress
         sync
-        echo "DEBUG: Mounting partition 2 to check contents..."
-        mkdir -p /tmp/mount-point
-        mount /tmp/part2.img /tmp/mount-point -o loop
-        echo "DEBUG: Contents of root filesystem"
-        ls -l /tmp/mount-point
-        echo "DEBUG: Contents of /init in root filesystem"
-        ls -l /tmp/mount-point/init || echo "ERROR: /init not found"
-        cat /tmp/mount-point/init || echo "ERROR: Cannot read /init"
-        umount /tmp/mount-point
         echo "DEBUG: Filesystem size in final image partition 2"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/part2.img | grep "Block count"
+        echo "DEBUG: Verifying init script presence in final image partition 2"
+        ${pkgs.e2fsprogs}/bin/debugfs -R "ls -l /" /tmp/part2.img
+        ${pkgs.e2fsprogs}/bin/debugfs -R "cat /init" /tmp/part2.img || echo "ERROR: /init not found or unreadable"
         echo "DEBUG: Verifying final image filesystem integrity"
         ${pkgs.e2fsprogs}/bin/fsck.ext4 -n /tmp/part2.img
         echo "Post-build commands completed."
