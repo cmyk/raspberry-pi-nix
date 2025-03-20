@@ -44,24 +44,34 @@ EOF
       '';
       firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
+        echo "Starting post-build commands..."
         # Resize image to match NVMe partition (7.5G)
+        echo "Truncating image to 7.5G..."
         truncate -s 7500M $img
+        echo "Updating partition table..."
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
         echo "DEBUG: Before resize - ls -l ./root-fs.img"
         ls -l ./root-fs.img
-        echo "DEBUG: Copying root-fs.img to temp location"
+        echo "Copying root-fs.img to temp location..."
         cp ./root-fs.img /tmp/root-fs.img
         chmod 666 /tmp/root-fs.img
         echo "DEBUG: After chmod - ls -l /tmp/root-fs.img"
         ls -l /tmp/root-fs.img
+        echo "Resizing filesystem to $((SECTORS - 32768)) blocks..."
         ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $((SECTORS - 32768))
-        echo "DEBUG: Copying resized root-fs.img back"
+        echo "DEBUG: Filesystem size after resize"
+        ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
+        echo "Copying resized root-fs.img back..."
         chmod 666 ./root-fs.img
         echo "DEBUG: After chmod on original - ls -l ./root-fs.img"
         ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
-        dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS
+        echo "Writing root filesystem to image with progress..."
+        ${pkgs.pv}/bin/pv ./root-fs.img | dd conv=notrunc of=$img seek=$START count=$SECTORS bs=512
+        echo "DEBUG: Final image partition table"
+        sfdisk -d $img
+        echo "Post-build commands completed."
       '';
     };
   };
