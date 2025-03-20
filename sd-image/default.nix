@@ -33,6 +33,7 @@ gpu_mem=256
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
+boot_order=0x20
 EOF
         echo "root=/dev/nvme0n1p2 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=2M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
@@ -59,20 +60,9 @@ EOF
         echo "Ensuring root-fs.img is writable..."
         chmod 666 ./root-fs.img
         echo "Resizing filesystem to match partition..."
-        ${pkgs.e2fsprogs}/bin/resize2fs ./root-fs.img $SECTORS  # Use actual partition size
+        ${pkgs.e2fsprogs}/bin/resize2fs ./root-fs.img $SECTORS
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs ./root-fs.img | grep "Block count"
-        echo "Copying root-fs.img to temp location..."
-        cp ./root-fs.img /tmp/root-fs.img
-        chmod 666 /tmp/root-fs.img
-        echo "DEBUG: After chmod - ls -l /tmp/root-fs.img"
-        ls -l /tmp/root-fs.img
-        echo "Checking and repairing filesystem..."
-        ${pkgs.e2fsprogs}/bin/e2fsck -fy /tmp/root-fs.img || true
-        echo "Copying resized root-fs.img back..."
-        chmod 666 ./root-fs.img
-        cp /tmp/root-fs.img ./root-fs.img
-        sync
         echo "Writing root filesystem to image..."
         dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS bs=512 status=progress
         sync
