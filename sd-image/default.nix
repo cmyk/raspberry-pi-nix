@@ -43,6 +43,18 @@ EOF
         chmod 744 ./files/sbin/init
       '';
       firmwareSize = 1024; # 1 GiB
+            populateRootCommands = ''
+        echo "Populating root filesystem..."
+        mkdir -p ./files
+        content="$(
+          echo "#!${pkgs.bash}/bin/bash"
+          echo "exec ${config.system.build.toplevel}/init"
+        )"
+        echo "$content" > ./files/init
+        chmod 744 ./files/init
+        echo "DEBUG: Verifying init script in ./files"
+        ls -l ./files/init
+      '';
       postBuildCommands = ''
         echo "Starting post-build commands..."
         # Resize image to match NVMe partition (7.5G)
@@ -54,26 +66,47 @@ EOF
         echo "DEBUG: Partition 2 - START=$START, SECTORS=$SECTORS"
         echo "DEBUG: Before resize - ls -l ./root-fs.img"
         ls -l ./root-fs.img
-        echo "DEBUG: Copying root-fs.img to temp location..."
+        echo "DEBUG: Filesystem size before resize"
+        ${pkgs.e2fsprogs}/bin/dumpe2fs ./root-fs.img | grep "Block count"
+        echo "Copying root-fs.img to temp location..."
         cp ./root-fs.img /tmp/root-fs.img
         chmod 666 /tmp/root-fs.img
         echo "DEBUG: After chmod - ls -l /tmp/root-fs.img"
         ls -l /tmp/root-fs.img
-        echo "DEBUG: Filesystem size before resize"
+        echo "DEBUG: Filesystem size before resize (temp)"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Resizing filesystem to 1655808 blocks (to match NVMe partition)..."
         ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img 1655808
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Copying resized root-fs.img back..."
-        chmod 666 ./root-fs.img
-        echo "DEBUG: After chmod on original - ls -l ./root-fs.img"
-        ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
+        sync
+        echo "DEBUG: After copy back - ls -l ./root-fs.img"
+        ls -l ./root-fs.img
+        echo "DEBUG: Filesystem size after copy back"
+        ${pkgs.e2fsprogs}/bin/dumpe2fs ./root-fs.img | grep "Block count"
         echo "Writing root filesystem to image with progress..."
         dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS bs=512 status=progress
+        sync
         echo "DEBUG: Final image partition table"
         sfdisk -d $img
+        echo "DEBUG: Extracting partition 2 from final image to verify filesystem contents..."
+        dd if=$img of=/tmp/part2.img skip=$START count=$SECTORS bs=512 status=progress
+        sync
+        echo "DEBUG: Mounting partition 2 to check contents..."
+        mkdir -p /tmp/mount-point
+        mount /tmp/part2.img /tmp/mount-point -o loop
+        echo "DEBUG: Contents of root filesystem"
+        ls -l /tmp/mount-point
+        echo "DEBUG: Contents of /init in root filesystem"
+        ls -l /tmp/mount-point/init || echo "ERROR: /init not found"
+        cat /tmp/mount-point/init || echo "ERROR: Cannot read /init"
+        umount /tmp/mount-point
+        echo "DEBUG: Filesystem size in final image partition 2"
+        ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/part2.img | grep "Block count"
+        echo "DEBUG: Verifying final image filesystem integrity"
+        ${pkgs.e2fsprogs}/bin/fsck.ext4 -n /tmp/part2.img
         echo "Post-build commands completed."
       '';
     };
