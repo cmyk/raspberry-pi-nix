@@ -51,15 +51,18 @@ EOF
         echo "Updating partition table..."
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
+        echo "DEBUG: Partition 2 - START=$START, SECTORS=$SECTORS"
         echo "DEBUG: Before resize - ls -l ./root-fs.img"
         ls -l ./root-fs.img
-        echo "Copying root-fs.img to temp location..."
+        echo "DEBUG: Copying root-fs.img to temp location..."
         cp ./root-fs.img /tmp/root-fs.img
         chmod 666 /tmp/root-fs.img
         echo "DEBUG: After chmod - ls -l /tmp/root-fs.img"
         ls -l /tmp/root-fs.img
-        echo "Resizing filesystem to $((SECTORS - 32768)) blocks..."
-        ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $((SECTORS - 32768))
+        echo "DEBUG: Filesystem size before resize"
+        ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
+        echo "Resizing filesystem to 1655808 blocks (to match NVMe partition)..."
+        ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img 1655808
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Copying resized root-fs.img back..."
@@ -68,7 +71,7 @@ EOF
         ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
         echo "Writing root filesystem to image with progress..."
-        ${pkgs.pv}/bin/pv ./root-fs.img | dd conv=notrunc of=$img seek=$START count=$SECTORS bs=512
+        dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS bs=512 status=progress
         echo "DEBUG: Final image partition table"
         sfdisk -d $img
         echo "Post-build commands completed."
