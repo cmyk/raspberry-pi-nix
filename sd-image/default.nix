@@ -33,7 +33,7 @@ initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
 #os_check=0
 EOF
-        echo "root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+        echo "coherent_pool=2M cma=256M root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
         echo "Populating root filesystem..."
