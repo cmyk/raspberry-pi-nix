@@ -27,10 +27,10 @@ arm_64bit=1
 #enable_uart=0
 dtoverlay=disable-bt
 dtoverlay=bcm2712d0
-#dtoverlay=vc4-kms-v3d-pi5
-dtoverlay=disable-vc4
+dtoverlay=vc4-kms-v3d-pi5
+#dtoverlay=disable-vc4
 gpu_mem=256   # Allocate more GPU memory
-coherent_pool=8M
+coherent_pool=16M
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
@@ -41,12 +41,10 @@ EOF
       populateRootCommands = ''
         echo "Populating root filesystem..."
         mkdir -p ./files
-        content="$(
-          echo "#!${pkgs.bash}/bin/bash"
-          echo "exec ${config.system.build.toplevel}/init"
-        )"
+        content="#!${pkgs.bash}/bin/bash
+        exec ${config.system.build.toplevel}/init"
         echo "$content" > ./files/init
-        chmod 744 ./files/init
+        chmod +x ./files/init
         echo "DEBUG: Verifying init script in ./files"
         ls -l ./files/init
       '';
@@ -72,7 +70,7 @@ EOF
         echo "DEBUG: Filesystem size before resize (temp)"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Resizing filesystem to 1655808 blocks (to match NVMe partition)..."
-        ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img 1655808
+        ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $(stat -c %s /tmp/root-fs.img)
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Copying resized root-fs.img back..."
