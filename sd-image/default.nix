@@ -1,14 +1,17 @@
-{ config, lib, pkgs, ... }:
-{
+{ config, lib, pkgs, ... }: {
   imports = [ ./sd-image.nix ];
   config = {
     boot.loader.grub.enable = false;
     boot.consoleLogLevel = lib.mkDefault 7;
     boot.kernelParams = [
-      "root=PARTUUID=${lib.strings.removePrefix "0x" config.sdImage.firmwarePartitionID}-02"
+      "root=/dev/nvme0n1p2"
       "rootfstype=ext4"
       "fsck.repair=yes"
       "rootwait"
+      "console=ttyAMA10,115200"
+      "coherent_pool=2M"
+      "cma=512M"
+      "nvme_core.default_ps_max_latency_us=0"
     ];
     sdImage = {
       populateFirmwareCommands = ''
@@ -24,19 +27,14 @@
         cat > firmware/config.txt <<EOF
 [all]
 arm_64bit=1
-#enable_uart=0
-#dtoverlay=disable-bt
 dtoverlay=bcm2712d0
 dtoverlay=vc4-kms-v3d-pi5
-#dtoverlay=disable-vc4
-gpu_mem=256   # Allocate more GPU memory
-coherent_pool=16M
+gpu_mem=256
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
-#os_check=0
 EOF
-        echo "root=PARTUUID=${lib.strings.removePrefix "0x" config.sdImage.firmwarePartitionID}-02 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=8M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+        echo "root=/dev/nvme0n1p2 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=2M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
         echo "Populating root filesystem..."
@@ -51,13 +49,13 @@ EOF
       firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
         echo "Starting post-build commands..."
-        # Resize image to match NVMe partition (7.5G)
-        echo "Truncating image to 7.5G..."
-        truncate -s 7500M $img
+        echo "Truncating image to 8G..."
+        truncate -s 8192M $img
         echo "Updating partition table..."
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
         echo "DEBUG: Partition 2 - START=$START, SECTORS=$SECTORS"
+
         echo "DEBUG: Before resize - ls -l ./root-fs.img"
         ls -l ./root-fs.img
         echo "DEBUG: Filesystem size before resize"
