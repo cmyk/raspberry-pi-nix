@@ -38,13 +38,13 @@ EOF
       '';
       populateRootCommands = ''
         echo "Populating root filesystem..."
-        mkdir -p ./files
+        mkdir -p ./files/sbin
         content="#!${pkgs.bash}/bin/bash
         exec ${config.system.build.toplevel}/init"
-        echo "$content" > ./files/init
-        chmod +x ./files/init
+        echo "$content" > ./files/sbin/init
+        chmod +x ./files/sbin/init
         echo "DEBUG: Verifying init script in ./files"
-        ls -l ./files/init
+        ls -l ./files/sbin/init
       '';
       firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
