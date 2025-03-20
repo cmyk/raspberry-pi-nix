@@ -15,7 +15,8 @@
       "fsck.mode=force"
       "hctosys=0"
       "rtc.rpi=0"
-      "rtc=0" # Disable all RTC devices
+      "rtc=0"
+      "bcm2835_mbox.disable=1"
     ];
     sdImage = {
       populateFirmwareCommands = ''
@@ -33,14 +34,15 @@
 arm_64bit=1
 dtoverlay=bcm2712d0
 dtoverlay=vc4-kms-v3d-pi5
+dtoverlay=disable-bt
+dtoverlay=mailbox-disable
 gpu_mem=256
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
 boot_order=0x20
-
 EOF
-        echo "root=/dev/nvme0n1p2 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=4M cma=512M nvme_core.default_ps_max_latency_us=0 fsck.mode=force" > firmware/cmdline.txt
+        echo "root=/dev/nvme0n1p2 rootfstype=ext4 fsck.repair=yes rootwait console=ttyAMA10,115200 coherent_pool=4M cma=512M nvme_core.default_ps_max_latency_us=0 fsck.mode=force hctosys=0 rtc.rpi=0 rtc=0 bcm2835_mbox.disable=1" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
         echo "Populating root filesystem..."
