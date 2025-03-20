@@ -56,12 +56,10 @@ EOF
         echo ",+," | sfdisk -N 2 --no-reread $img
         eval $(partx $img -o START,SECTORS --nr 2 --pairs)
         echo "DEBUG: Partition 2 - START=$START, SECTORS=$SECTORS"
-        echo "DEBUG: Before resize - ls -l ./root-fs.img"
-        ls -l ./root-fs.img
         echo "Ensuring root-fs.img is writable..."
         chmod 666 ./root-fs.img
-        echo "Resizing filesystem to full 8G..."
-        ${pkgs.e2fsprogs}/bin/resize2fs ./root-fs.img 2097152  # 8G = 2097152 4K blocks
+        echo "Resizing filesystem to match partition..."
+        ${pkgs.e2fsprogs}/bin/resize2fs ./root-fs.img $SECTORS  # Use actual partition size
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs ./root-fs.img | grep "Block count"
         echo "Copying root-fs.img to temp location..."
@@ -69,35 +67,17 @@ EOF
         chmod 666 /tmp/root-fs.img
         echo "DEBUG: After chmod - ls -l /tmp/root-fs.img"
         ls -l /tmp/root-fs.img
-        echo "DEBUG: Filesystem size before resize (temp)"
-        ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
-        echo "Checking and repairing filesystem before resizing..."
+        echo "Checking and repairing filesystem..."
         ${pkgs.e2fsprogs}/bin/e2fsck -fy /tmp/root-fs.img || true
         echo "Copying resized root-fs.img back..."
         chmod 666 ./root-fs.img
-        echo "DEBUG: Permissions after chmod - ls -l ./root-fs.img"
-        ls -l ./root-fs.img
         cp /tmp/root-fs.img ./root-fs.img
         sync
-        echo "DEBUG: After copy back - ls -l ./root-fs.img"
-        ls -l ./root-fs.img
-        echo "DEBUG: Filesystem size after copy back"
-        ${pkgs.e2fsprogs}/bin/dumpe2fs ./root-fs.img | grep "Block count"
-        echo "Writing root filesystem to image with progress..."
+        echo "Writing root filesystem to image..."
         dd conv=notrunc if=./root-fs.img of=$img seek=$START count=$SECTORS bs=512 status=progress
         sync
         echo "DEBUG: Final image partition table"
         sfdisk -d $img
-        echo "DEBUG: Extracting partition 2 from final image to verify filesystem size..."
-        dd if=$img of=/tmp/part2.img skip=$START count=$SECTORS bs=512 status=progress
-        sync
-        echo "DEBUG: Filesystem size in final image partition 2"
-        ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/part2.img | grep "Block count"
-        echo "DEBUG: Verifying init script presence in final image partition 2"
-        ${pkgs.e2fsprogs}/bin/debugfs -R "ls -l /" /tmp/part2.img
-        ${pkgs.e2fsprogs}/bin/debugfs -R "cat /init" /tmp/part2.img || echo "ERROR: /init not found or unreadable"
-        echo "DEBUG: Verifying final image filesystem integrity"
-        ${pkgs.e2fsprogs}/bin/fsck.ext4 -n /tmp/part2.img
         echo "Post-build commands completed."
       '';
     };
