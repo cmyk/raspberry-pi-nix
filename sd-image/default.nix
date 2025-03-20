@@ -25,7 +25,7 @@
 [all]
 arm_64bit=1
 #enable_uart=0
-dtoverlay=disable-bt
+#dtoverlay=disable-bt
 dtoverlay=bcm2712d0
 dtoverlay=vc4-kms-v3d-pi5
 #dtoverlay=disable-vc4
