@@ -13,6 +13,8 @@
       "cma=512M"
       "nvme_core.default_ps_max_latency_us=0"
       "fsck.mode=force"
+      "hctosys=0"
+      "rtc.rpi=0"
     ];
     sdImage = {
       populateFirmwareCommands = ''
