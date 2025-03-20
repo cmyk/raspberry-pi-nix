@@ -69,8 +69,15 @@ EOF
         ls -l /tmp/root-fs.img
         echo "DEBUG: Filesystem size before resize (temp)"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
-        echo "Resizing filesystem to 1655808 blocks (to match NVMe partition)..."
-        ${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $(stat -c %s /tmp/root-fs.img)
+        echo "Checking and repairing filesystem before resizing..."
+${pkgs.e2fsprogs}/bin/e2fsck -fy /tmp/root-fs.img || true
+
+echo "Calculating correct size for resize..."
+BLOCK_COUNT=$(stat -c %s /tmp/root-fs.img)
+BLOCK_COUNT=$(( BLOCK_COUNT / 4096 ))
+
+echo "Resizing filesystem safely to $BLOCK_COUNT blocks..."
+${pkgs.e2fsprogs}/bin/resize2fs /tmp/root-fs.img $BLOCK_COUNT
         echo "DEBUG: Filesystem size after resize"
         ${pkgs.e2fsprogs}/bin/dumpe2fs /tmp/root-fs.img | grep "Block count"
         echo "Copying resized root-fs.img back..."
