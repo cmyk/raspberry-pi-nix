@@ -12,6 +12,7 @@
       "coherent_pool=2M"
       "cma=512M"
       "nvme_core.default_ps_max_latency_us=0"
+      "fsck.mode=force"
     ];
     sdImage = {
       populateFirmwareCommands = ''
@@ -34,7 +35,6 @@ kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
 boot_order=0x20
-fsck.mode=force
 
 EOF
         echo "root=/dev/nvme0n1p2 rootfstype=ext4 rootwait console=ttyAMA10,115200 coherent_pool=2M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
