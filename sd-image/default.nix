@@ -27,13 +27,16 @@ arm_64bit=1
 #enable_uart=0
 dtoverlay=disable-bt
 dtoverlay=bcm2712d0
-dtoverlay=vc4-kms-v3d-pi5
+#dtoverlay=vc4-kms-v3d-pi5
+dtoverlay=disable-vc4
+gpu_mem=256   # Allocate more GPU memory
+coherent_pool=8M
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
 #os_check=0
 EOF
-        echo "root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 coherent_pool=2M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
+        echo "root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 coherent_pool=8M cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
         echo "Populating root filesystem..."
