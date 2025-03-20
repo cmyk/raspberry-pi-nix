@@ -15,6 +15,7 @@
       "fsck.mode=force"
       "hctosys=0"
       "rtc.rpi=0"
+      "rtc=0" # Disable all RTC devices
     ];
     sdImage = {
       populateFirmwareCommands = ''
