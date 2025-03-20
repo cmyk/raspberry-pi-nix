@@ -34,16 +34,6 @@ EOF
         echo "8250.nr_uarts=0 root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
       populateRootCommands = ''
-        mkdir -p ./files/sbin
-        content="$(
-          echo "#!${pkgs.bash}/bin/bash"
-          echo "exec ${config.system.build.toplevel}/init"
-        )"
-        echo "$content" > ./files/sbin/init
-        chmod 744 ./files/sbin/init
-      '';
-      firmwareSize = 1024; # 1 GiB
-            populateRootCommands = ''
         echo "Populating root filesystem..."
         mkdir -p ./files
         content="$(
@@ -55,6 +45,7 @@ EOF
         echo "DEBUG: Verifying init script in ./files"
         ls -l ./files/init
       '';
+      firmwareSize = 1024; # 1 GiB
       postBuildCommands = ''
         echo "Starting post-build commands..."
         # Resize image to match NVMe partition (7.5G)
