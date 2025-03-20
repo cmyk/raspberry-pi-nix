@@ -19,17 +19,19 @@
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/start4.elf firmware/start4.elf
         cp ${pkgs.raspberrypifw}/share/raspberrypi/boot/fixup4.dat firmware/fixup4.dat
         mkdir -p firmware/overlays
+        # https://github.com/agherzan/meta-raspberrypi/issues/1394#issuecomment-2552721960
         cp ${config.boot.kernelPackages.kernel}/dtbs/overlays/bcm2712d0.dtbo firmware/overlays/bcm2712d0.dtbo
         cat > firmware/config.txt <<EOF
 [all]
 arm_64bit=1
-enable_uart=0
+#enable_uart=0
 dtoverlay=disable-bt
 dtoverlay=bcm2712d0
+dtoverlay=vc4-kms-v3d-pi5
 kernel=kernel.img
 initramfs initrd followkernel
 device_tree=bcm2712-rpi-cm5-cm5io.dtb
-os_check=0
+#os_check=0
 EOF
         echo "8250.nr_uarts=0 root=/dev/nvme0n1p2 rootwait console=ttyAMA10,115200 cma=512M nvme_core.default_ps_max_latency_us=0" > firmware/cmdline.txt
       '';
