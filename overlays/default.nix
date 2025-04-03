@@ -26,6 +26,7 @@ let
     };
     v6_12_20 = { 
       src = rpi-linux-6_12_20-src; # Same rpi-6.12.y source
+      version = "6.12.21";
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
