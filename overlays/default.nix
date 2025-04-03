@@ -24,7 +24,7 @@ let
         }
       ];
     };
-    v6_12_20 = { 
+    v6_12_21 = { 
       src = rpi-linux-6_12_20-src; # Same rpi-6.12.y source
       version = "6.12.21";
     };
