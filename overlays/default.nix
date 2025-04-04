@@ -25,7 +25,10 @@ let
       ];
     };
     v6_12_21 = { 
-      src = "/nix/store/1fd65d173w2hvzbgy02r0w8sr2njqka8-linux-rpi-6.12.21-rtc-slim";      
+      src = final.runCommand "fake-kernel-source" {} ''
+        mkdir -p $out
+        echo "Fake source for 6.12.21" > $out/README
+      '';     
       version = "6.12.21";
     };
   };
