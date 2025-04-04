@@ -39,8 +39,8 @@ let
     in
     {
       "${version}"."${board}" = (final.buildLinux {
-        modDirVersion = version-slug;
-        version = version-slug;
+        modDirVersion = kernel.version or version-slug;
+        version = kernel.version or version-slug;
         pname = "linux-rpi";
         src = kernel.src;
         defconfig = "${board}_defconfig";
