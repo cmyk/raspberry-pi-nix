@@ -1,7 +1,7 @@
 { rpi-linux-stable-src
 , rpi-linux-6_6_78-src
 , rpi-linux-6_12_17-src
-, rpi-linux-6_12_21-src
+, rpi-linux-6_12_20-src
 , rpi-firmware-src
 , rpi-firmware-nonfree-src
 , rpi-bluez-firmware-src
@@ -24,9 +24,9 @@ let
         }
       ];
     };
-    v6_12_21 = { 
-      src = /nix/store/1fd65d173w2hvzbgy02r0w8sr2njqka8-linux-rpi-6.12.21-rtc-slim;     
-      version = "6.12.21";
+    v6_12_20 = {
+      src = rpi-linux-6_12_20-src;
+      version = "6.12.20";
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
