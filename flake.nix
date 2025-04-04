@@ -7,7 +7,7 @@
       flake = false;
       url = "github:raspberrypi/linux/stable_20241008";
     };
-    rpi-linux-6_12_20-src = {
+    rpi-linux-6_12_21-src = {
       flake = false;
       url = "github:raspberrypi/linux/rpi-6.12.y";
     };
