@@ -25,7 +25,7 @@ let
       ];
     };
     v6_12_21 = { 
-      src = src = "/nix/store/1fd65d173w2hvzbgy02r0w8sr2njqka8-linux-rpi-6.12.21-rtc-slim";      
+      src = "/nix/store/1fd65d173w2hvzbgy02r0w8sr2njqka8-linux-rpi-6.12.21-rtc-slim";      
       version = "6.12.21";
     };
   };
