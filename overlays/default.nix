@@ -27,6 +27,18 @@ let
     v6_12_20 = {
       src = rpi-linux-6_12_20-src;
       version = "6.12.20-rtc-slim";
+      extraMeta = {
+        branch = "6.12";
+      };
+      kernelPatches = [
+        {
+          name = "set-version-to-6.12.20-rtc-slim";
+          patch = null;
+          extraConfig = ''
+            EXTRAVERSION = -rtc-slim
+          '';
+        }
+      ];
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
