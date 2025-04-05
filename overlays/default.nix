@@ -13,12 +13,6 @@ let
       extraMeta = {
         branch = "6.12";
       };
-      patches = [
-        {
-          name = "set-version-to-6.12.20-rtc-slim";
-          patch = ./set-version-to-6.12.20-rtc-slim.patch; # Path to the patch file
-        }
-      ];
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
