@@ -33,10 +33,7 @@ let
       kernelPatches = [
         {
           name = "set-version-to-6.12.20-rtc-slim";
-          patch = null;
-          extraConfig = ''
-            EXTRAVERSION = -rtc-slim
-          '';
+          patch = ./set-version-to-6.12.20-rtc-slim.patch; # Path to the patch file
         }
       ];
     };
