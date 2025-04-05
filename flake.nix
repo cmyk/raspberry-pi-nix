@@ -33,9 +33,9 @@
     };
   };
 
-  outputs = srcs@{ self, ... }:
+  outputs = { self, nixpkgs, rpi-linux-6_12_20-src, rpi-firmware-src, rpi-firmware-nonfree-src, rpi-bluez-firmware-src, rpicam-apps-src, libcamera-src, libpisp-src }:
     let
-      pinned = import srcs.nixpkgs {
+      pinned = import nixpkgs {
         system = "aarch64-linux";
         overlays = with self.overlays; [ core libcamera ];
       };
@@ -43,13 +43,9 @@
     {
       overlays = {
         core = import ./overlays {
-          inherit (srcs)
-            rpi-linux-6_12_20-src
-            rpi-firmware-src
-            rpi-firmware-nonfree-src
-            rpi-bluez-firmware-src;
+          inherit rpi-linux-6_12_20-src rpi-firmware-src rpi-firmware-nonfree-src rpi-bluez-firmware-src;
         };
-        libcamera = import ./overlays/libcamera.nix (builtins.removeAttrs srcs [ "self" ]);
+        libcamera = import ./overlays/libcamera.nix { inherit rpicam-apps-src libcamera-src libpisp-src; };
       };
       nixosModules = {
         raspberry-pi = import ./rpi {
@@ -60,20 +56,20 @@
         sd-image = import ./sd-image;
       };
       nixosConfigurations = {
-        rpi-example = srcs.nixpkgs.lib.nixosSystem {
+        rpi-example = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
           modules = [ self.nixosModules.raspberry-pi self.nixosModules.sd-image ./example ];
         };
       };
       checks.aarch64-linux = self.packages.aarch64-linux;
       packages.aarch64-linux = {
-  
-      example-sd-image = self.nixosConfigurations.rpi-example.config.system.build.sdImage;
-      firmware = pinned.raspberrypifw;
-      libcamera = pinned.libcamera;
-      wireless-firmware = pinned.raspberrypiWirelessFirmware;
-      uboot-rpi-arm64 = pinned.uboot-rpi-arm64;
-      linux-6_12_20-bcm2712 = pinned.rpi-kernels.v6_12_20.bcm2712;
-};
+        example-sd-image = self.nixosConfigurations.rpi-example.config.system.build.sdImage;
+        firmware = pinned.raspberrypifw;
+        libcamera = pinned.libcamera;
+        wireless-firmware = pinned.raspberrypiWirelessFirmware;
+        uboot-rpi-arm64 = pinned.uboot-rpi-arm64;
+        linux-6_12_20-bcm2712 = pinned.rpi-kernels.v6_12_20.bcm2712;
+        rpi-linux-6_12_20-src = rpi-linux-6_12_20-src; # Expose the input as an output
+      };
     };
 }
