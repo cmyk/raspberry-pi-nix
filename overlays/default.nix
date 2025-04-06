@@ -9,10 +9,7 @@ let
   versions = {
     v6_12_20 = {
       src = rpi-linux-6_12_20-src;
-      version = "6.12.20-rtc-slim";
-      extraMeta = {
-        branch = "6.12";
-      };
+      version = "6.12.21";
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
