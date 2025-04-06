@@ -9,7 +9,7 @@
     };
     rpi-firmware-src = {
       flake = false;
-      url = "github:raspberrypi/firmware/1.20241008";
+      url = "github:raspberrypi/firmware/1.20250326";
     };
     rpi-firmware-nonfree-src = {
       flake = false;

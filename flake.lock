@@ -99,16 +99,16 @@
     "rpi-firmware-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1728405098,
-        "narHash": "sha256-4gnK0KbqFnjBmWia9Jt2gveVWftmHrprpwBqYVqE/k0=",
+        "lastModified": 1742998042,
+        "narHash": "sha256-o198RfJe2UUEjtEJnAVMrEG5bQkZca1nzsaUKOKVAQo=",
         "owner": "raspberrypi",
         "repo": "firmware",
-        "rev": "7bbb5f80d20a2335066a8781459c9f33e5eebc64",
+        "rev": "f49a3960223f20ea0b2e30646f65be67bafe30dc",
         "type": "github"
       },
       "original": {
         "owner": "raspberrypi",
-        "ref": "1.20241008",
+        "ref": "1.20250326",
         "repo": "firmware",
         "type": "github"
       }
