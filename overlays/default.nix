@@ -51,7 +51,7 @@ let
         };
         features.efiBootStub = false;
         kernelPatches =
-          if kernel ? "patches" then kernel.patches else [ ];
+          if kernelInfo ? "patches" then kernel.patches else [ ];
         ignoreConfigErrors = true;
       }).overrideAttrs
         (oldAttrs: {
