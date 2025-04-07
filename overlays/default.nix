@@ -24,10 +24,10 @@ let
     in
     {
       "${version}"."${board}" = (final.buildLinux {
-        modDirVersion = kernel.version or version-slug;
-        version = kernel.version or version-slug;
+        modDirVersion = modDirVersion;
+        version = kernelInfo.version or version-slug;
         pname = "linux-rpi";
-        src = kernel.src;
+        src = kernelInfo.src;
         defconfig = "${board}_defconfig";
         structuredExtraConfig = with final.lib.kernel; {
           # The perl script to generate kernel options sets unspecified
