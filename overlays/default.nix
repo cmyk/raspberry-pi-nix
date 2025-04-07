@@ -18,7 +18,6 @@ let
   # Helpers for building the `pkgs.rpi-kernels' map.
   rpi-kernel = { version, board }:
     let
-      let
         version-slug = builtins.replaceStrings [ "v" "_" ] [ "" "." ] version;
         kernelInfo = builtins.getAttr version versions;
         modDirVersion = kernelInfo.modDirVersion or kernelInfo.version or version-slug;
