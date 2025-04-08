@@ -10,7 +10,7 @@ let
     v6_12_20 = {
       src = rpi-linux-6_12_20-src;
       version = "6.12.21";
-      modDirVersion = "6.12.21-v8-16k";
+      modDirVersion = "6.12.21-rtc-slim-hardened-v8-16k";
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
