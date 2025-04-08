@@ -9,7 +9,7 @@ let
   versions = {
     v6_12_20 = {
       src = rpi-linux-6_12_20-src;
-      version = "6.12.21";
+      version = "6.12.22";
       modDirVersion = "6.12.22-rtc-slim-hardened-v8-16k";
     };
   };
