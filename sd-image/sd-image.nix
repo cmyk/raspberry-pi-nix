@@ -33,7 +33,7 @@ let
   });
 in
 {
-  imports = [ ];
+  imports = [./root-commands.nix];
 
   options.sdImage = {
     imageName = mkOption {
