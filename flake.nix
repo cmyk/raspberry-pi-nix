@@ -70,7 +70,6 @@
         wireless-firmware = pinned.raspberrypiWirelessFirmware;
         uboot-rpi-arm64 = pinned.uboot-rpi-arm64;
         linux-6_12_20-bcm2712 = pinned.rpi-kernels.v6_12_20.bcm2712;
-        rpi-linux-6_12_20-src = rpi-linux-6_12_20-src; # Expose the input as an output
       };
     };
 }
