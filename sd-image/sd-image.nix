@@ -112,22 +112,18 @@ in
       '';
     };
 
-    populateRootCommands = lib.mkDefault (
-      if cfg.uboot.enable
-      then ''
-        mkdir -p ./files/boot
-        ${config.boot.loader.generic-extlinux-compatible.populateCmd} -c ${config.system.build.toplevel} -d ./files/boot
-      ''
-      else ''
-        mkdir -p ./files/sbin
-        content="$(
-          echo "#!${pkgs.bash}/bin/bash"
-          echo "exec ${config.system.build.toplevel}/init"
-        )"
-        echo "$content" > ./files/sbin/init
-        chmod 744 ./files/sbin/init
-      ''
-    );
+    populateRootCommands = mkOption {
+      type = types.str;
+      default = "";
+      example = literalExpression
+        "''\${config.boot.loader.generic-extlinux-compatible.populateCmd} -c \${config.system.build.toplevel} -d ./files/boot''";
+      description = ''
+        Shell commands to populate the ./files directory.
+        All files in that directory are copied to the
+        root (/) partition on the SD image. Use this to
+        populate the ./files/boot (/boot) directory.
+      '';
+    };
 
     postBuildCommands = mkOption {
       example = literalExpression
