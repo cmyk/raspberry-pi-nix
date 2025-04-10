@@ -1,3 +1,4 @@
+# raspberry-pi-nix/flake.nix
 {
   description = "raspberry-pi nixos configuration";
 

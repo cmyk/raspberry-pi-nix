@@ -114,7 +114,20 @@ in
 
     populateRootCommands = mkOption {
       type = types.str;
-      default = "";
+      default = if config.raspberry-pi-nix.uboot.enable
+        then ''
+          mkdir -p ./files/boot
+          ${config.boot.loader.generic-extlinux-compatible.populateCmd} -c ${config.system.build.toplevel} -d ./files/boot
+        ''
+        else ''
+          mkdir -p ./files/sbin
+          content="$(
+            echo "#!${pkgs.bash}/bin/bash"
+            echo "exec ${config.system.build.toplevel}/init"
+          )"
+          echo "$content" > ./files/sbin/init
+          chmod 744 ./files/sbin/init
+        '';
       example = literalExpression
         "''\${config.boot.loader.generic-extlinux-compatible.populateCmd} -c \${config.system.build.toplevel} -d ./files/boot''";
       description = ''

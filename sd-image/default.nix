@@ -50,21 +50,7 @@
           cp -r ${pkgs.raspberrypifw}/share/raspberrypi/boot/{start*.elf,*.dtb,bootcode.bin,fixup*.dat,overlays} firmware
           cp ${config.hardware.raspberry-pi.config-output} firmware/config.txt
         '';
-        populateRootCommands =
-          if cfg.uboot.enable
-          then ''
-            mkdir -p ./files/boot
-            ${config.boot.loader.generic-extlinux-compatible.populateCmd} -c ${config.system.build.toplevel} -d ./files/boot
-          ''
-          else lib.mkDefault ''
-            mkdir -p ./files/sbin
-            content="$(
-              echo "#!${pkgs.bash}/bin/bash"
-              echo "exec ${config.system.build.toplevel}/init"
-            )"
-            echo "$content" > ./files/sbin/init
-            chmod 744 ./files/sbin/init
-          '';
+        
       };
   };
 }
