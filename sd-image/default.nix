@@ -1,3 +1,4 @@
+# sd-image/default.nix
 { config, lib, pkgs, ... }:
 
 {
@@ -55,7 +56,7 @@
             mkdir -p ./files/boot
             ${config.boot.loader.generic-extlinux-compatible.populateCmd} -c ${config.system.build.toplevel} -d ./files/boot
           ''
-          else ''
+          else lib.mkDefault ''
             mkdir -p ./files/sbin
             content="$(
               echo "#!${pkgs.bash}/bin/bash"

@@ -1,3 +1,4 @@
+# sd-image/sd-image.nix
 # This module was lifted from nixpkgs installer code. It is modified
 # so as to not import all-hardware. The goal here is to write the
 # nixos image for a raspberry pi to an sd-card in a way so that we can
@@ -112,6 +113,8 @@ in
     };
 
     populateRootCommands = mkOption {
+      type = types.str;
+      default = ""
       example = literalExpression
         "''\${config.boot.loader.generic-extlinux-compatible.populateCmd} -c \${config.system.build.toplevel} -d ./files/boot''";
       description = ''
