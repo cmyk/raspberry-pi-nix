@@ -114,7 +114,7 @@ in
 
     populateRootCommands = mkOption {
       type = types.str;
-      default = ""
+      default = "";
       example = literalExpression
         "''\${config.boot.loader.generic-extlinux-compatible.populateCmd} -c \${config.system.build.toplevel} -d ./files/boot''";
       description = ''
