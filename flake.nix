@@ -4,9 +4,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    # rpi-linux-6_12_20-src = {
+    #   flake = false;
+    #   url = "github:raspberrypi/linux/rpi-6.12.y";
+    # };
+    # pinning 1284626bb6c6728a5b792eea2a615f9e0edde32d to avoid accidential kernel rebuilds
     rpi-linux-6_12_20-src = {
       flake = false;
-      url = "github:raspberrypi/linux/rpi-6.12.y";
+      url = "github:raspberrypi/linux?rev=1284626bb6c6728a5b792eea2a615f9e0edde32d";
     };
     rpi-firmware-src = {
       flake = false;
