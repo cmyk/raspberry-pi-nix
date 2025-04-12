@@ -109,7 +109,7 @@ in
         src = final.emptyDirectory;
         structuredExtraConfig = {};
         defconfig = "bcm2711_defconfig";
-        extraMeta.platforms = [ ];
+        extraMeta.platforms = [ "aarch64-linux" ];
       };
       bcm2712 = final.buildLinux {
         version = "0";
@@ -117,7 +117,7 @@ in
         src = final.emptyDirectory;
         structuredExtraConfig = {};
         defconfig = "bcm2712_defconfig";
-        extraMeta.platforms = [ ];
+        extraMeta.platforms = [ "aarch64-linux" ];
       };
     };
   };
