@@ -103,8 +103,8 @@ in
 } // {
   rpi-kernels = {
     v6_12_20 = {
-      bcm2712 = final.lib.mkForce (throw "Do not evaluate pkgs.rpi-kernels.v6_12_20.bcm2712 directly. PixOS overrides it.");
+      bcm2712 = final.lib.mkForce (throw "Do not evaluate pkgs.rpi-kernels.v6_12_20.bcm2712 directly. Use PixOS override.");
+      bcm2711 = final.lib.mkForce (throw "Do not evaluate pkgs.rpi-kernels.v6_12_20.bcm2711 directly. Use PixOS override.");
     };
   };
 }
-
