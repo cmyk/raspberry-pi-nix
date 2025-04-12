@@ -101,8 +101,10 @@ in
   raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
 
 } // {
-  rpi-kernels = final.lib.mkForce {
-    __functor = self: throw "Do not evaluate pkgs.rpi-kernels directly. Use PixOS override.";
+  rpi-kernels = {
+    v6_12_20 = {
+      bcm2712 = final.lib.mkForce (throw "Do not evaluate pkgs.rpi-kernels.v6_12_20.bcm2712 directly. PixOS overrides it.");
+    };
   };
 }
 
