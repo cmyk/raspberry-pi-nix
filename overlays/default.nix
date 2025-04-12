@@ -100,7 +100,9 @@ in
     { };
   raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
 
+} // {
+  rpi-kernels = final.lib.mkForce {
+    __functor = self: throw "Do not evaluate pkgs.rpi-kernels directly. Use PixOS override.";
+  };
 }
-# Do not evaluate rpi-kernels automatically.
-# They are opt-in only through specific .override calls in downstream projects like PixOS.
 
