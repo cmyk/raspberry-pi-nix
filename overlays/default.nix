@@ -11,7 +11,8 @@ let
     v6_12_20 = {
       src = rpi-linux-6_12_20-src;
       version = "6.12.22";
-      modDirVersion = "6.12.22-rtc-slim-hardened-v8-16k";
+      # Do NOT set modDirVersion here.
+      # Let it default to the actual kernel output: 6.12.22-v8-16k
     };
   };
   boards = [ "bcm2711" "bcm2712" ];
@@ -21,7 +22,7 @@ let
     let
         version-slug = builtins.replaceStrings [ "v" "_" ] [ "" "." ] version;
         kernelInfo = builtins.getAttr version versions;
-        modDirVersion = kernelInfo.modDirVersion or kernelInfo.version or version-slug;
+        modDirVersion = kernelInfo.modDirVersion or null;
     in
     {
       "${version}"."${board}" = (final.buildLinux {
@@ -99,13 +100,7 @@ in
     { };
   raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
 
-} // {
-  # rpi kernels and firmware are available at
-  # `pkgs.rpi-kernels.<VERSION>.<BOARD>'. 
-  #
-  # For example: `pkgs.rpi-kernels.v6_6_78.bcm2712'
-  rpi-kernels = rpi-kernels (
-    final.lib.cartesianProduct
-      { board = boards; version = (builtins.attrNames versions); }
-  );
 }
+# Do not evaluate rpi-kernels automatically.
+# They are opt-in only through specific .override calls in downstream projects like PixOS.
+
