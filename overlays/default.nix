@@ -103,19 +103,21 @@ in
 } // {
   rpi-kernels = {
     v6_12_20 = {
-      bcm2711 = final.stdenv.mkDerivation {
-        pname = "fake-kernel-bcm2711";
+      bcm2711 = final.buildLinux {
         version = "0";
-        src = null;
-        dontBuild = true;
-        installPhase = "mkdir -p $out";
+        modDirVersion = "0";
+        src = final.emptyDirectory;
+        structuredExtraConfig = {};
+        defconfig = "bcm2711_defconfig";
+        extraMeta.platforms = [ ];
       };
-      bcm2712 = final.stdenv.mkDerivation {
-        pname = "fake-kernel-bcm2712";
+      bcm2712 = final.buildLinux {
         version = "0";
-        src = null;
-        dontBuild = true;
-        installPhase = "mkdir -p $out";
+        modDirVersion = "0";
+        src = final.emptyDirectory;
+        structuredExtraConfig = {};
+        defconfig = "bcm2712_defconfig";
+        extraMeta.platforms = [ ];
       };
     };
   };
