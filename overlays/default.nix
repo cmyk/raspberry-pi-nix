@@ -100,24 +100,28 @@ in
     { };
   raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
 
+  raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
+
 } // {
   rpi-kernels = {
     v6_12_20 = {
       bcm2711 = final.buildLinux {
-        version = "0";
-        modDirVersion = "0";
-        src = final.emptyDirectory;
-        structuredExtraConfig = {};
+        version = "6.12.22";
+        modDirVersion = "6.12.22-v8";
+        src = rpi-linux-6_12_20-src;
         defconfig = "bcm2711_defconfig";
+        structuredExtraConfig = {};
         extraMeta.platforms = [ "aarch64-linux" ];
+        ignoreConfigErrors = true;
       };
       bcm2712 = final.buildLinux {
-        version = "0";
-        modDirVersion = "0";
-        src = final.emptyDirectory;
-        structuredExtraConfig = {};
+        version = "6.12.22";
+        modDirVersion = "6.12.22-v8";
+        src = rpi-linux-6_12_20-src;
         defconfig = "bcm2712_defconfig";
+        structuredExtraConfig = {};
         extraMeta.platforms = [ "aarch64-linux" ];
+        ignoreConfigErrors = true;
       };
     };
   };
