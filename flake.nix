@@ -61,15 +61,15 @@
         };
         sd-image = import ./sd-image;
       };
-      nixosConfigurations = {
-        rpi-example = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = [ self.nixosModules.raspberry-pi self.nixosModules.sd-image ./example ];
-        };
-      };
-      checks.aarch64-linux = builtins.removeAttrs self.packages.aarch64-linux [ "rpi-linux-6_12_20-src" ];
+      # nixosConfigurations = {
+      #   rpi-example = nixpkgs.lib.nixosSystem {
+      #     system = "aarch64-linux";
+      #     modules = [ self.nixosModules.raspberry-pi self.nixosModules.sd-image ./example ];
+      #   };
+      # };
+      #checks.aarch64-linux = builtins.removeAttrs self.packages.aarch64-linux [ "rpi-linux-6_12_20-src" ];
       packages.aarch64-linux = {
-        example-sd-image = self.nixosConfigurations.rpi-example.config.system.build.sdImage;
+        #example-sd-image = self.nixosConfigurations.rpi-example.config.system.build.sdImage;
         firmware = pinned.raspberrypifw;
         libcamera = pinned.libcamera;
         wireless-firmware = pinned.raspberrypiWirelessFirmware;

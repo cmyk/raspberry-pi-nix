@@ -1,4 +1,3 @@
-# overlays/default.nix
 { rpi-linux-6_12_20-src
 , rpi-firmware-src
 , rpi-firmware-nonfree-src
@@ -6,6 +5,7 @@
 , ...
 }:
 final: prev:
+
 let
   versions = {
     v6_12_20 = {
@@ -15,14 +15,15 @@ let
       # Let it default to the actual kernel output: 6.12.22-v8-16k
     };
   };
+
   boards = [ "bcm2711" "bcm2712" ];
 
   # Helpers for building the `pkgs.rpi-kernels' map.
   rpi-kernel = { version, board }:
     let
-        version-slug = builtins.replaceStrings [ "v" "_" ] [ "" "." ] version;
-        kernelInfo = builtins.getAttr version versions;
-        modDirVersion = kernelInfo.modDirVersion or null;
+      version-slug = builtins.replaceStrings [ "v" "_" ] [ "" "." ] version;
+      kernelInfo = builtins.getAttr version versions;
+      modDirVersion = kernelInfo.modDirVersion or null;
     in
     {
       "${version}"."${board}" = (final.buildLinux {
@@ -62,11 +63,18 @@ let
           '';
         });
     };
-  rpi-kernels = builtins.foldl'
-    (b: a: final.lib.recursiveUpdate b (rpi-kernel a))
-    { };
-in
-{
+
+    rpi-kernels = (
+      builtins.foldl'
+        (b: a: final.lib.recursiveUpdate b (rpi-kernel a))
+        { }
+        (final.lib.cartesianProduct { 
+          board = boards; 
+          version = builtins.attrNames versions; 
+        })
+    );
+
+in {
   # disable firmware compression so that brcm firmware can be found at
   # the path expected by raspberry pi firmware/device tree
   compressFirmwareXz = x: x;
@@ -77,16 +85,6 @@ in
     defconfig = "rpi_arm64_defconfig";
     extraMeta.platforms = [ "aarch64-linux" ];
     filesToInstall = [ "u-boot.bin" ];
-    # In raspberry pi sbcs the firmware manipulates the device tree in
-    # a variety of ways before handing it off to the linux kernel. [1]
-    # Since we have installed u-boot in place of a linux kernel we may
-    # pass the device tree passed by the firmware onto the kernel, or
-    # we may provide the kernel with a device tree of our own. This
-    # configuration uses the device tree provided by firmware so that
-    # we don't have to be aware of all manipulation done by the
-    # firmware and attempt to mimic it.
-    #
-    # 1. https://forums.raspberrypi.com/viewtopic.php?t=329799#p1974233
   };
 
   # default to latest firmware
@@ -98,30 +96,30 @@ in
       }
     )
     { };
-  raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
 
   raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
 
-} // {
   rpi-kernels = {
     v6_12_20 = {
       bcm2711 = final.buildLinux {
         version = "6.12.22";
-        modDirVersion = "6.12.22-v8";
+        modDirVersion = "6.12.22-v8-16k";
+        pname = "linux-rpi";
         src = rpi-linux-6_12_20-src;
         defconfig = "bcm2711_defconfig";
         structuredExtraConfig = {};
-        extraMeta.platforms = [ "aarch64-linux" ];
         ignoreConfigErrors = true;
+        extraMeta.platforms = [ "aarch64-linux" ];
       };
       bcm2712 = final.buildLinux {
         version = "6.12.22";
-        modDirVersion = "6.12.22-v8";
+        modDirVersion = "6.12.22-v8-16k";
+        pname = "linux-rpi";
         src = rpi-linux-6_12_20-src;
         defconfig = "bcm2712_defconfig";
         structuredExtraConfig = {};
-        extraMeta.platforms = [ "aarch64-linux" ];
         ignoreConfigErrors = true;
+        extraMeta.platforms = [ "aarch64-linux" ];
       };
     };
   };
