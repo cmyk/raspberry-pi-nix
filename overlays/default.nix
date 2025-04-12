@@ -103,8 +103,20 @@ in
 } // {
   rpi-kernels = {
     v6_12_20 = {
-      bcm2712 = final.lib.mkForce (throw "Do not evaluate pkgs.rpi-kernels.v6_12_20.bcm2712 directly. Use PixOS override.");
-      bcm2711 = final.lib.mkForce (throw "Do not evaluate pkgs.rpi-kernels.v6_12_20.bcm2711 directly. Use PixOS override.");
+      bcm2711 = final.stdenv.mkDerivation {
+        pname = "fake-kernel-bcm2711";
+        version = "0";
+        src = null;
+        dontBuild = true;
+        installPhase = "mkdir -p $out";
+      };
+      bcm2712 = final.stdenv.mkDerivation {
+        pname = "fake-kernel-bcm2712";
+        version = "0";
+        src = null;
+        dontBuild = true;
+        installPhase = "mkdir -p $out";
+      };
     };
   };
 }
