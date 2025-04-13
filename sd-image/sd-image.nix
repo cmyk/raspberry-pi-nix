@@ -245,7 +245,7 @@ in
             fsck.vfat -vn /tmp/part1_verify.img || echo "ERROR: Firmware partition is invalid after dd"
 
             ${config.sdImage.postBuildCommands}
-            
+
             echo "DEBUG: Copying firmware files to mounted partition..."
             cp -r firmware/* /tmp/mnt-firmware/ || {
               echo "ERROR: Failed to copy firmware files to mounted partition"
