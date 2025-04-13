@@ -246,71 +246,12 @@ in
 
             ${config.sdImage.postBuildCommands}
 
-            echo "DEBUG: Copying firmware files to mounted partition..."
-            cp -r firmware/* /tmp/mnt-firmware/ || {
-              echo "ERROR: Failed to copy firmware files to mounted partition"
-              exit 1
-            }
-            echo "DEBUG: Verifying mounted partition contents..."
-            ls -alh /tmp/mnt-firmware/
-            ls -alh /tmp/mnt-firmware/overlays/
-            umount /tmp/mnt-firmware
-            rm -rf /tmp/mnt-firmware
-
-            # Verify the FAT partition before copying it
-            echo "DEBUG: Verifying firmware_part.img after population..."
-            fsck.vfat -vn firmware_part.img || echo "ERROR: firmware_part.img is invalid after population"
-
-            # Write firmware_part.img to the final image
-            echo "DEBUG: Writing firmware_part.img to final image..."
-            dd conv=notrunc if=firmware_part.img of=$img seek=$START count=$SECTORS
-            echo "DEBUG: Verifying firmware_part.img after dd..."
-            dd if=$img of=/tmp/part1_verify.img skip=$START count=$SECTORS bs=512 status=progress
-            fsck.vfat -vn /tmp/part1_verify.img || echo "ERROR: Firmware partition is invalid after dd"
-            echo "DEBUG: Checking final image contents..."
-            mkdir -p /tmp/mnt-firmware-verify
-            mount /tmp/part1_verify.img /tmp/mnt-firmware-verify || echo "ERROR: Failed to mount firmware partition for verification"
-            ls -alh /tmp/mnt-firmware-verify/ || echo "ERROR: Failed to list firmware partition contents"
-            ls -alh /tmp/mnt-firmware-verify/overlays/ || echo "ERROR: Failed to list overlays directory"
-            umount /tmp/mnt-firmware-verify || true
-            rm -rf /tmp/mnt-firmware-verify /tmp/part1_verify.img
-
-            ${config.sdImage.postBuildCommands}
-
-            # Copy the populated /boot/firmware into the SD image
-            echo "DEBUG: Copying files to firmware_part.img with mcopy..."
-            (cd firmware; mcopy -psvm -i ../firmware_part.img ./* ::)
-            echo "DEBUG: Verifying firmware_part.img after mcopy..."
-            fsck.vfat -vn firmware_part.img || echo "ERROR: firmware_part.img is invalid after mcopy"
-            mkdir -p /tmp/mnt-firmware-after-mcopy
-            mount firmware_part.img /tmp/mnt-firmware-after-mcopy || echo "ERROR: Failed to mount firmware_part.img after mcopy"
-            ls -alh /tmp/mnt-firmware-after-mcopy/ || echo "ERROR: Failed to list firmware_part.img contents after mcopy"
-            ls -alh /tmp/mnt-firmware-after-mcopy/overlays/ || echo "ERROR: Failed to list overlays directory after mcopy"
-            umount /tmp/mnt-firmware-after-mcopy || true
-            rm -rf /tmp/mnt-firmware-after-mcopy
-
-            # Write firmware_part.img to the final image
-            echo "DEBUG: Writing firmware_part.img to final image..."
-            dd conv=notrunc if=firmware_part.img of=$img seek=$START count=$SECTORS
-            echo "DEBUG: Verifying firmware_part.img after dd..."
-            dd if=$img of=/tmp/part1_verify.img skip=$START count=$SECTORS bs=512 status=progress
-            fsck.vfat -vn /tmp/part1_verify.img || echo "ERROR: Firmware partition is invalid after dd"
-            echo "DEBUG: Checking final image contents..."
-            mkdir -p /tmp/mnt-firmware-verify
-            mount /tmp/part1_verify.img /tmp/mnt-firmware-verify || echo "ERROR: Failed to mount firmware partition for verification"
-            ls -alh /tmp/mnt-firmware-verify/ || echo "ERROR: Failed to list firmware partition contents"
-            ls -alh /tmp/mnt-firmware-verify/overlays/ || echo "ERROR: Failed to list overlays directory"
-            umount /tmp/mnt-firmware-verify || true
-            rm -rf /tmp/mnt-firmware-verify /tmp/part1_verify.img
-
-            ${config.sdImage.postBuildCommands}
-
             if test -n "$compressImage"; then
                 zstd -T$NIX_BUILD_CORES --rm $img
             fi
-          '';
+            '';
         })
-      { };
+    { };
 
     boot.postBootCommands = lib.mkIf config.sdImage.expandOnBoot ''
       # On the first boot do some maintenance tasks
