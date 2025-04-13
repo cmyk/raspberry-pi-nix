@@ -221,17 +221,35 @@ in
 
             # Create a FAT32 /boot/firmware partition of suitable size into firmware_part.img
             eval $(partx $img -o START,SECTORS --nr 1 --pairs)
+
             truncate -s $((SECTORS * 512)) firmware_part.img
-            faketime "1970-01-01 00:00:00" mkfs.vfat -i ${config.sdImage.firmwarePartitionID} -n ${config.raspberry-pi-nix.firmware-partition-label} firmware_part.img
+            echo "DEBUG: Creating firmware_part.img with mkfs.vfat..."
+            mkfs.vfat -F 32 -s 8 -S 512 -i ${config.sdImage.firmwarePartitionID} -n ${config.raspberry-pi-nix.firmware-partition-label} firmware_part.img
+            echo "DEBUG: Verifying firmware_part.img after creation..."
+            fsck.vfat -vn firmware_part.img || echo "ERROR: firmware_part.img is invalid after creation"
+            mkdir -p /tmp/mnt-firmware-initial
+            mount firmware_part.img /tmp/mnt-firmware-initial || echo "ERROR: Failed to mount firmware_part.img after creation"
+            ls -alh /tmp/mnt-firmware-initial/ || echo "ERROR: Failed to list firmware_part.img contents after creation"
+            umount /tmp/mnt-firmware-initial || true
+            rm -rf /tmp/mnt-firmware-initial
 
             # Populate the files intended for /boot/firmware
             mkdir firmware
             ${config.sdImage.populateFirmwareCommands}
 
             # Copy the populated /boot/firmware into the SD image
+            echo "DEBUG: Copying files to firmware_part.img with mcopy..."
             (cd firmware; mcopy -psvm -i ../firmware_part.img ./* ::)
-            # Verify the FAT partition before copying it.
-            fsck.vfat -vn firmware_part.img
+            echo "DEBUG: Verifying firmware_part.img after mcopy..."
+            fsck.vfat -vn firmware_part.img || echo "ERROR: firmware_part.img is invalid after mcopy"
+            mkdir -p /tmp/mnt-firmware-after-mcopy
+            mount firmware_part.img /tmp/mnt-firmware-after-mcopy || echo "ERROR: Failed to mount firmware_part.img after mcopy"
+            ls -alh /tmp/mnt-firmware-after-mcopy/ || echo "ERROR: Failed to list firmware_part.img contents after mcopy"
+            ls -alh /tmp/mnt-firmware-after-mcopy/overlays/ || echo "ERROR: Failed to list overlays directory after mcopy"
+            umount /tmp/mnt-firmware-after-mcopy || true
+            rm -rf /tmp/mnt-firmware-after-mcopy
+
+            # Write firmware_part.img to the final image
             echo "DEBUG: Writing firmware_part.img to final image..."
             dd conv=notrunc if=firmware_part.img of=$img seek=$START count=$SECTORS
             echo "DEBUG: Verifying firmware_part.img after dd..."
