@@ -232,7 +232,18 @@ in
             (cd firmware; mcopy -psvm -i ../firmware_part.img ./* ::)
             # Verify the FAT partition before copying it.
             fsck.vfat -vn firmware_part.img
+            echo "DEBUG: Writing firmware_part.img to final image..."
             dd conv=notrunc if=firmware_part.img of=$img seek=$START count=$SECTORS
+            echo "DEBUG: Verifying firmware_part.img after dd..."
+            dd if=$img of=/tmp/part1_verify.img skip=$START count=$SECTORS bs=512 status=progress
+            fsck.vfat -vn /tmp/part1_verify.img || echo "ERROR: Firmware partition is invalid after dd"
+            echo "DEBUG: Checking final image contents..."
+            mkdir -p /tmp/mnt-firmware-verify
+            mount /tmp/part1_verify.img /tmp/mnt-firmware-verify || echo "ERROR: Failed to mount firmware partition for verification"
+            ls -alh /tmp/mnt-firmware-verify/ || echo "ERROR: Failed to list firmware partition contents"
+            ls -alh /tmp/mnt-firmware-verify/overlays/ || echo "ERROR: Failed to list overlays directory"
+            umount /tmp/mnt-firmware-verify || true
+            rm -rf /tmp/mnt-firmware-verify /tmp/part1_verify.img
 
             ${config.sdImage.postBuildCommands}
 

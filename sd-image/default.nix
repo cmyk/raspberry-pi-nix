@@ -51,6 +51,7 @@
           cp ${config.hardware.raspberry-pi.config-output} firmware/config.txt
         '';
         
+        # This was commented out due to modularization of disk-image.nix
         # populateRootCommands = lib.mkDefault (
         #   if cfg.uboot.enable
         #   then ''
