@@ -233,7 +233,8 @@ in
 
             # Copy the populated /boot/firmware into the SD image
             echo "DEBUG: Copying files to firmware_part.img with mcopy..."
-            (cd firmware; mcopy -psvm -i ../firmware_part.img ./* ::)
+            # Update: also copy dotfiles
+            (cd firmware; mcopy -psvm -i ../firmware_part.img ./ ::)
             echo "DEBUG: Verifying firmware_part.img after mcopy..."
             fsck.vfat -vn firmware_part.img || echo "ERROR: firmware_part.img is invalid after mcopy"
 
