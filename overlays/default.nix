@@ -98,7 +98,16 @@ in {
     )
     { };
 
-  raspberrypifw = prev.raspberrypifw.overrideAttrs (oldfw: { src = rpi-firmware-src; });
+  raspberrypifw = prev.raspberrypifw.overrideAttrs (_: {
+    version = "1.20250326";
+    src = rpi-firmware-src;
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/share/raspberrypi/boot
+      cp -r boot/* $out/share/raspberrypi/boot/
+      runHook postInstall
+    '';
+  });
 
   rpi-kernels = {
     v6_12_20 = {
