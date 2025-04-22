@@ -11,7 +11,9 @@
     # pinning 1284626bb6c6728a5b792eea2a615f9e0edde32d to avoid accidential kernel rebuilds
     rpi-linux-6_12_20-src = {
       flake = false;
-      url = "github:raspberrypi/linux?rev=1284626bb6c6728a5b792eea2a615f9e0edde32d";
+      url = "https://github.com/raspberrypi/linux";
+      rev = "1284626bb6c6728a5b792eea2a615f9e0edde32d";
+      narHash = "sha256-F5pYVExFWC3Vb7I/kyhB0+Kn3LTM0kblwc5aLopOsok=";
     };
     rpi-firmware-src = {
       flake = false;
