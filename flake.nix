@@ -35,7 +35,7 @@
     };
     libpisp-src = {
       flake = false;
-      url = "github:raspberrypi/libpisp/v1.0.7";
+      url = "github:raspberrypi/libpisp/v1.2.0";
     };
   };
 
