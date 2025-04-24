@@ -10,7 +10,7 @@
     # };
     rpi-linux-6_12_20-src = {
       flake = false;
-      url = "github:RPi-Distro/linux-packaging?rev=77ae17a9141a626a24e790566ab6e435fbd157f9";
+      url = "github:raspberrypi/linux?rev=cd231d4775b14f228606c09f219b48308f6ab3aa";
     };
     rpi-firmware-src = {
       flake = false;
