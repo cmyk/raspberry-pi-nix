@@ -116,17 +116,17 @@
     "rpi-linux-6_12_20-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1743013113,
-        "narHash": "sha256-onV3SmBao5JseMKm9N+oNZP5u9uR93t0VXgiEmScA6Y=",
-        "owner": "RPi-Distro",
-        "repo": "linux-packaging",
-        "rev": "77ae17a9141a626a24e790566ab6e435fbd157f9",
+        "lastModified": 1742992765,
+        "narHash": "sha256-hSlzUXkfsWiE/HsSOEEx9RQlN4lXj2UV8Qgcfq1T5pg=",
+        "owner": "raspberrypi",
+        "repo": "linux",
+        "rev": "cd231d4775b14f228606c09f219b48308f6ab3aa",
         "type": "github"
       },
       "original": {
-        "owner": "RPi-Distro",
-        "repo": "linux-packaging",
-        "rev": "77ae17a9141a626a24e790566ab6e435fbd157f9",
+        "owner": "raspberrypi",
+        "repo": "linux",
+        "rev": "cd231d4775b14f228606c09f219b48308f6ab3aa",
         "type": "github"
       }
     },
