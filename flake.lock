@@ -20,16 +20,16 @@
     "libpisp-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1724944683,
-        "narHash": "sha256-Fo2UJmQHS855YSSKKmGrsQnJzXog1cdpkIOO72yYAM4=",
+        "lastModified": 1740559338,
+        "narHash": "sha256-tHfFcNSmXLcUHhqiGRh2YZT8xioUq0zMOMZl9rjG8ys=",
         "owner": "raspberrypi",
         "repo": "libpisp",
-        "rev": "28196ed6edcfeda88d23cc5f213d51aa6fa17bb3",
+        "rev": "50426319aa1a9ba4672f91977429365ad4e335a2",
         "type": "github"
       },
       "original": {
         "owner": "raspberrypi",
-        "ref": "v1.0.7",
+        "ref": "v1.2.0",
         "repo": "libpisp",
         "type": "github"
       }
