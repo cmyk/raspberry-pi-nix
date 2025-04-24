@@ -10,7 +10,7 @@
     # };
     rpi-linux-6_12_20-src = {
       flake = false;
-      url = "github:RPi-Distro/linux-packaging?ref=pios/6.12.20-1%2Brpt1";
+      url = "github:RPi-Distro/linux-packaging?rev=77ae17a9141a626a24e790566ab6e435fbd157f9";
     };
     rpi-firmware-src = {
       flake = false;
