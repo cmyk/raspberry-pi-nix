@@ -11,7 +11,7 @@ let
   versions = {
     v6_12_20 = {
       src = rpi-linux-6_12_20-src;
-      version = "6.12.22";
+      version = "6.12.20";
       # Do NOT set modDirVersion here.
       # Let it default to the actual kernel output: 6.12.22-v8-16k
     };
@@ -112,22 +112,30 @@ in {
   rpi-kernels = {
     v6_12_20 = {
       bcm2711 = final.buildLinux {
-        version = "6.12.22";
-        modDirVersion = "6.12.22-v8-16k";
+        version = "6.12.20";
+        modDirVersion = "6.12.20-v8-16k";
         pname = "linux-rpi";
         src = rpi-linux-6_12_20-src;
         defconfig = "bcm2711_defconfig";
-        structuredExtraConfig = {};
+        structuredExtraConfig = with final.lib.kernel; {
+          KUNIT = no;
+          RTC_RPI = module;  # From kernel.nix
+          I2C_BCM2835 = module;  # From kernel.nix
+        };
         ignoreConfigErrors = true;
         extraMeta.platforms = [ "aarch64-linux" ];
       };
       bcm2712 = final.buildLinux {
-        version = "6.12.22";
-        modDirVersion = "6.12.22-v8-16k";
+        version = "6.12.20";
+        modDirVersion = "6.12.20-v8-16k";
         pname = "linux-rpi";
         src = rpi-linux-6_12_20-src;
         defconfig = "bcm2712_defconfig";
-        structuredExtraConfig = {};
+        structuredExtraConfig = with final.lib.kernel; {
+          KUNIT = no;
+          RTC_RPI = module;  # From kernel.nix
+          I2C_BCM2835 = module;  # From kernel.nix
+        };
         ignoreConfigErrors = true;
         extraMeta.platforms = [ "aarch64-linux" ];
       };
